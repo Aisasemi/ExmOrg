@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='20' fill='%233b82f6'/%3E%3Cpath d='M30 30h40v15H30zM15 65h20v15H15zM40 65h20v15H40zM65 65h20v15H65z' fill='white'/%3E%3Cpath d='M50 45v10M25 55h50M25 55v10M50 55v10M75 55v10' stroke='white' stroke-width='4'/%3E%3C/svg%3E" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlexOrg - Creador de Organigramas</title>
+    <meta name="description" content="Creador y editor interactivo de organigramas con soporte para agrupaciones recursivas e importación/exportación JSON, desarrollado con D3.js y D3 FlexTree." />
+    <!-- Google Fonts: Plus Jakarta Sans for premium modern look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="app" class="app-container">
+      <!-- HEADER -->
+      <header class="app-header">
+        <div class="logo-area">
+          <svg class="header-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="32" height="32">
+            <rect width="100" height="100" rx="22" fill="url(#logo-grad)" />
+            <path d="M30 25h40v12H30zM15 63h20v12H15zM40 63h20v12H40zM65 63h20v12H65z" fill="white" />
+            <path d="M50 37v13M25 50h50M25 50v13M50 50v13M75 50v13" stroke="white" stroke-width="4" stroke-linecap="round" />
+            <defs>
+              <linearGradient id="logo-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#0f6cbd" />
+                <stop offset="100%" stop-color="#115ea3" />
+              </linearGradient>
+            </defs>
+          </svg>
+          <h1 id="app-title-h1">FlexOrg</h1>
+          <span class="badge badge-indigo">v1.0</span>
+        </div>
+        <div class="header-actions">
+          <button id="btn-load-example" class="btn btn-outline">
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+            Cargar Ejemplo
+          </button>
+          <button id="btn-export-json" class="btn btn-outline">
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+            Exportar JSON
+          </button>
+          <button id="btn-import-trigger" class="btn btn-outline">
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Importar JSON
+          </button>
+          <button id="btn-reset-all" class="btn btn-danger">
+            <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+            Reiniciar
+          </button>
+          <input type="file" id="input-import-file" accept=".json" style="display: none;" />
+        </div>
+      </header>
+
+      <!-- MAIN APP BODY -->
+      <div class="app-body">
+        
+        <!-- SIDEBAR: NODE PANEL & EDITORS -->
+        <aside class="app-sidebar" id="sidebar-panel">
+          
+          <!-- SELECTION CONTAINER -->
+          <div class="sidebar-section" id="section-selection-details">
+            <h2 class="sidebar-title">Propiedades del Elemento</h2>
+            <div id="no-selection-msg" class="no-selection">
+              <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="empty-icon"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              <p>Selecciona un nodo en el organigrama para ver o editar sus detalles.</p>
+            </div>
+            
+            <form id="form-node-properties" class="node-form" style="display: none;">
+              <div class="form-group">
+                <label for="node-prop-id">ID del Nodo</label>
+                <input type="text" id="node-prop-id" readonly class="input-readonly" />
+              </div>
+
+              <!-- Disclaimer Banners for Clones -->
+              <div id="node-clone-disclaimer" class="disclaimer-banner disclaimer-info" style="display: none;">
+                🔗 <strong>Estructura Vinculada:</strong> Los cambios estructurales se guardarán en el nodo original y se propagarán a todas las referencias en caliente.
+              </div>
+              <div id="node-employee-disclaimer" class="disclaimer-banner disclaimer-warning" style="display: none;">
+                👤 <strong>Empleado Independiente:</strong> Este empleado es exclusivo de esta rama clonada y no afectará a ninguna otra referencia.
+              </div>
+              
+              <div class="form-group">
+                <label for="node-prop-type-display">Tipo de Elemento</label>
+                <div class="type-badge-container">
+                  <span id="node-prop-type-badge" class="type-badge"></span>
+                </div>
+              </div>
+
+              <!-- Link Reference Section -->
+              <div class="form-group" id="node-prop-reference-container" style="display: none;">
+                <label for="node-prop-reference">Vincular Estructura (Referencia)</label>
+                <select id="node-prop-reference" style="width: 100%;">
+                  <!-- Dynamically populated eligible reference source nodes -->
+                </select>
+                <div style="font-size: 0.7rem; color: var(--text-secondary); margin-top: 0.125rem;">
+                  Clona la estructura del origen en caliente, excepto empleados.
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="node-prop-name">Nombre / Título</label>
+                <input type="text" id="node-prop-name" required placeholder="Ej. Depto. Finanzas, Director..." />
+              </div>
+
+              <div class="form-group">
+                <label for="node-prop-description">Descripción</label>
+                <textarea id="node-prop-description" rows="3" placeholder="Descripción opcional del puesto, departamento o sede..."></textarea>
+              </div>
+
+              <!-- Collapse Branch Option -->
+              <div class="form-group" id="node-prop-collapse-container" style="display: none; margin-top: 0.25rem;">
+                <label style="display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal; font-size: 0.8125rem; color: var(--text-primary);">
+                  <input type="checkbox" id="node-prop-collapsed" style="cursor: pointer;" />
+                  <span>Contraer rama (ocultar hijos)</span>
+                </label>
+              </div>
+
+              <!-- Collapse Internal Content Option (Only for Groupings) -->
+              <div class="form-group" id="node-prop-collapse-internal-container" style="display: none; margin-top: 0.25rem;">
+                <label style="display: inline-flex; align-items: center; gap: 0.5rem; cursor: pointer; font-weight: normal; font-size: 0.8125rem; color: var(--text-primary);">
+                  <input type="checkbox" id="node-prop-collapsed-internal" style="cursor: pointer;" />
+                  <span>Ocultar contenido interno</span>
+                </label>
+              </div>
+
+              <!-- BUTTONS FOR SELECTED NODE -->
+              <div class="form-actions">
+                <button type="button" id="btn-delete-node" class="btn btn-danger btn-full">
+                  <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
+                  Eliminar Elemento
+                </button>
+              </div>
+            </form>
+          </div>
+
+          <!-- GROUPING SPECIAL ACTION -->
+          <div class="sidebar-section" id="section-grouping-action" style="display: none;">
+            <h2 class="sidebar-title">Organigrama Interno</h2>
+            <div class="grouping-box">
+              <p id="grouping-status-desc">Este elemento es una <strong>Agrupación</strong>. Puedes administrar su organigrama interno e independiente.</p>
+              <button type="button" id="btn-enter-grouping" class="btn btn-indigo btn-full">
+                <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6"></path><path d="M9 21H3v-6"></path><path d="M21 3l-7 7"></path><path d="M3 21l7-7"></path></svg>
+                Enfocar Organigrama
+              </button>
+              
+            </div>
+          </div>
+
+          <!-- ADD CHILD SECTION -->
+          <div class="sidebar-section" id="section-add-child" style="display: none;">
+            <h2 class="sidebar-title">Agregar Elemento Hijo</h2>
+            <form id="form-add-child" class="node-form">
+              <!-- Location selection when adding child to a grouping -->
+              <div class="form-group" id="group-child-relation-container" style="display: none; margin-bottom: 0.25rem;">
+                <label>Ubicación del Hijo</label>
+                <div style="display: flex; gap: 1rem; margin-top: 0.15rem; background: rgba(0,0,0,0.2); padding: 0.375rem 0.5rem; border-radius: 0.25rem; border: 1px solid var(--border-color);">
+                  <label style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; font-weight: normal; cursor: pointer; color: var(--text-primary);">
+                    <input type="radio" name="child-relation" value="internal" checked style="margin: 0;" /> Interno (dentro)
+                  </label>
+                  <label style="display: inline-flex; align-items: center; gap: 0.25rem; font-size: 0.75rem; font-weight: normal; cursor: pointer; color: var(--text-secondary);">
+                    <input type="radio" name="child-relation" value="external" style="margin: 0;" /> Externo (abajo)
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="child-type">Tipo de Hijo</label>
+                <select id="child-type" required>
+                  <!-- Dynamically populated based on active node constraints -->
+                </select>
+                <div id="child-type-warning" class="input-warning" style="display: none;">
+                  Los empleados solo pueden crearse dentro de puestos.
+                </div>
+              </div>
+              
+              <div class="form-group">
+                <label for="child-name">Nombre / Título</label>
+                <input type="text" id="child-name" required placeholder="Nombre del nuevo elemento" />
+              </div>
+
+              <div class="form-group">
+                <label for="child-description">Descripción</label>
+                <textarea id="child-description" rows="2" placeholder="Descripción opcional"></textarea>
+              </div>
+
+              <button type="submit" id="btn-submit-child" class="btn btn-primary btn-full">
+                <svg class="icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                Agregar Elemento
+              </button>
+            </form>
+          </div>
+
+          <!-- RULES AND HELP PANEL -->
+          <div class="sidebar-section help-section">
+            <h3 class="help-title">Reglas de Jerarquía</h3>
+            <ul class="help-list">
+              <li>
+                <span class="bullet-dot bullet-org"></span>
+                <strong>Organización</strong> es la raíz del organigrama y es única. No puede ir dentro de agrupaciones.
+              </li>
+              <li>
+                <span class="bullet-dot bullet-emp"></span>
+                Los <strong>Empleados</strong> sólo pueden ir dentro de un <strong>Puesto de Trabajo</strong> y no tienen hijos.
+              </li>
+              <li>
+                <span class="bullet-dot bullet-grp"></span>
+                Las <strong>Agrupaciones</strong> contienen un organigrama interno recursivo.
+              </li>
+              <li>
+                <span class="bullet-dot bullet-normal"></span>
+                Sedes, Departamentos y Puestos no tienen restricciones de nivel.
+              </li>
+            </ul>
+          </div>
+        </aside>
+
+        <!-- MAIN AREA: CANVAS AND BREADCRUMBS -->
+        <main class="app-canvas-container">
+          <!-- BREADCRUMBS / NAVIGATION BAR -->
+          <nav class="navigation-bar" aria-label="Jerarquía de navegación">
+            <div id="breadcrumbs" class="breadcrumbs">
+              <!-- Dynamically populated, e.g.: Inicio / Agrupación A / Agrupación B -->
+            </div>
+            <button id="btn-exit-grouping" class="btn btn-outline btn-sm" style="display: none;">
+              <svg class="icon" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+              Subir de Nivel
+            </button>
+          </nav>
+
+          <!-- SVG CANVAS -->
+          <div class="canvas-wrapper">
+            <div id="canvas-container" class="canvas-container">
+              <!-- SVG will be appended here -->
+            </div>
+
+            <!-- CANVAS CONTROLS -->
+            <div class="canvas-controls">
+              <button id="btn-zoom-in" class="control-btn" title="Acercar">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </button>
+              <button id="btn-zoom-out" class="control-btn" title="Alejar">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              </button>
+              <button id="btn-zoom-reset" class="control-btn" title="Centrar">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path></svg>
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+      
+      <!-- IMPORT JSON MODAL -->
+      <div id="import-modal" class="modal-overlay" style="display: none;">
+        <div class="modal-box">
+          <div class="modal-header">
+            <h3>Importar Organigrama JSON</h3>
+            <button id="btn-close-modal" class="modal-close-btn">&times;</button>
+          </div>
+          <div class="modal-body">
+            <p class="modal-desc">Pega el código JSON de tu organigrama aquí. Asegúrate de que cumpla con la estructura requerida y las restricciones de nodo.</p>
+            <textarea id="textarea-import-json" placeholder='{"id": "root", "name": "Mi Organización", "type": "organizacion", ...}'></textarea>
+            <div id="import-error-msg" class="import-error" style="display: none;"></div>
+          </div>
+          <div class="modal-footer">
+            <button id="btn-cancel-import" class="btn btn-outline">Cancelar</button>
+            <button id="btn-submit-import-json" class="btn btn-primary">Importar</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTIFICATION SYSTEM -->
+      <div id="toast-container" class="toast-container"></div>
+    </div>
+    
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

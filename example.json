@@ -1,0 +1,137 @@
+{
+    "id": "node-root-org",
+    "name": "Nueva Organización",
+    "type": "organizacion",
+    "description": "Nodo raíz del organigrama.",
+    "children": [
+        {
+            "id": "node-1779797503492-371",
+            "name": "Direccion",
+            "type": "agrupacion",
+            "description": "",
+            "children": [
+                {
+                    "id": "node-1779797887294-527",
+                    "name": "Sede GC",
+                    "type": "sede",
+                    "description": "",
+                    "children": [
+                        {
+                            "id": "node-1779797949503-911",
+                            "name": "Calidad",
+                            "type": "departamento",
+                            "description": "",
+                            "children": [
+                                {
+                                    "id": "node-1779798082169-422",
+                                    "name": "Auditores",
+                                    "type": "puesto",
+                                    "description": "",
+                                    "children": [
+                                        {
+                                            "id": "node-1779798256999-614",
+                                            "name": "Cristina",
+                                            "type": "empleado",
+                                            "description": "",
+                                            "children": []
+                                        }
+                                    ]
+                                },
+                                {
+                                    "id": "node-1779798097110-416",
+                                    "name": "Consultores",
+                                    "type": "puesto",
+                                    "description": "",
+                                    "children": []
+                                }
+                            ]
+                        },
+                        {
+                            "id": "node-1779797993674-169",
+                            "name": "Ventas",
+                            "type": "departamento",
+                            "description": "",
+                            "children": [
+                                {
+                                    "id": "node-1779798108459-532",
+                                    "name": "Comerciales",
+                                    "type": "puesto",
+                                    "description": "",
+                                    "children": []
+                                },
+                                {
+                                    "id": "node-1779798137481-542",
+                                    "name": "Facturacion",
+                                    "type": "puesto",
+                                    "description": "",
+                                    "children": []
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": "node-1779797926302-564",
+                    "name": "Sede TF",
+                    "type": "sede",
+                    "description": "",
+                    "children": [
+                        {
+                            "id": "node-1779797964253-630",
+                            "name": "Ventas",
+                            "type": "departamento",
+                            "description": "",
+                            "children": []
+                        }
+                    ],
+                    "referencesNodeId": "node-1779797887294-527",
+                    "customData": {
+                        "node-1779798082169-422": {
+                            "employees": [
+                                {
+                                    "id": "node-1779798262977-370",
+                                    "name": "Sonia",
+                                    "type": "empleado",
+                                    "description": "",
+                                    "children": []
+                                }
+                            ]
+                        }
+                    }
+                }
+            ],
+            "internalChildren": [
+                {
+                    "id": "node-1779797825730-464",
+                    "name": "Director A",
+                    "type": "puesto",
+                    "description": "",
+                    "children": [
+                        {
+                            "id": "node-1779797856723-434",
+                            "name": "Pepe",
+                            "type": "empleado",
+                            "description": "",
+                            "children": []
+                        }
+                    ]
+                },
+                {
+                    "id": "node-1779797838757-365",
+                    "name": "Director B",
+                    "type": "puesto",
+                    "description": "",
+                    "children": [
+                        {
+                            "id": "node-1779797864762-681",
+                            "name": "Pepa",
+                            "type": "empleado",
+                            "description": "",
+                            "children": []
+                        }
+                    ]
+                }
+            ]
+        }
+    ]
+}
